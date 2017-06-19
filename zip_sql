@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# simple script to covert the US.txt file into SQL
+# formatted text.  Uses CAT to output results
+
+# temp files
+datafile=./tempfile$$
+TEMP=./tempLoop$$
+tempCol=./tempCol$$
+OUT=./tempOut$$
+tempMed=./tempMed$$
+
+# function to force remove temp files
+function removeAll {
+	rm -f $datafile
+	rm -f $TEMP
+	rm -f $tempCol
+	rm -f $OUT
+	rm -f $tempMed
+	exit
+}
+
+# trap rm temp files
+trap "removeAll; exit 1" INT HUP TERM
+
+
+# stdinput cat in user input into temp file
+if [ "$#" = "1" ]
+then
+	# check file not empty
+	cat $1 > $datafile
+	wordCount=$(wc -w < $datafile)
+	if ((wordCount != 0))
+	then
+		
+		# main loop for copy to SQL
+		while read myLine
+		do
+			echo -n "(" >> $OUT
+			echo "$myLine" > $TEMP
+			count=$(wc -w < $TEMP)
+			if (($count != 0))
+			then
+			for ((i=1; i<=11; i++))
+			do
+				if ((i == 2))
+				then
+					STR=$(cut -d"	" -f$i $TEMP)
+					echo -n "'">> $OUT
+					echo -n $STR >> $OUT
+					echo -n "', " >> $OUT
+				fi
+
+				if ((i == 3))
+				then
+					STR=$(cut -d"	" -f$i $TEMP)
+					echo -n "'">> $OUT
+					echo -n $STR >> $OUT
+					echo -n "'," >> $OUT
+				fi
+
+				if ((i == 5))
+				then
+					STR=$(cut -d"	" -f$i $TEMP)
+					echo -n "'">> $OUT
+					echo -n $STR >> $OUT
+					echo -n "'," >> $OUT
+				fi
+				if ((i == 10))
+				then
+					STR=$(cut -d"	" -f$i $TEMP)
+					
+					echo -n $STR >> $OUT
+					echo -n "," >> $OUT
+				fi
+				if ((i == 11))
+				then
+					STR=$(cut -d"	" -f$i $TEMP)
+				
+					echo -n $STR >> $OUT
+				fi
+			done
+			
+			echo " )," >> $OUT
+			fi
+		done < $1
+		
+		#remove temp files
+		rm $datafile
+		rm $TEMP
+		rm $tempCol
+		rm $tempMed
+	
+	else
+	# if file is empty
+	echo "FILE IS EMPTY"
+	rm $datafile
+	exit 1
+	fi
+else
+	# bad usage, echo usage and exit 1
+	echo "Usage: zip_sql {-rows|-cols} [file]" 1>&2
+	rm $datafile
+	exit 1
+fi
+
+cat $OUT
+rm $OUT
+
+exit 0
