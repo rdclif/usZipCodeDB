@@ -1,8 +1,8 @@
 #!/usr/bin/php
 <?php
-$dbname = 'us_zips';
-$dbuser = 'rdclifdb';
-$dbpass = 'kHs-R3W-mgd-RGw';
+$dbname = ;
+$dbuser = ;
+$dbpass = ;
 
 $mysql_handle = mysql_connect('myzipdb.cech3cllvxv3.us-west-2.rds.amazonaws.com:3306', $dbuser, $dbpass)
     or die("Error connecting to database server");
